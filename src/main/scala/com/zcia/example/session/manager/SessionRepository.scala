@@ -23,18 +23,20 @@ trait SessionRepository {
     * Read session data for the given session id.
     *
     * @param id
+    * @tparam T
     * @return
     */
-  def read(id: String): Future[Option[Object]]
+  def read[T](id: String): Future[Option[T]]
 
   /**
     * Update the whole session data with a new one given some session id.
     *
     * @param id
     * @param value
+    * @tparam T
     * @return
     */
-  def update(id: String, value: Object): Future[Unit]
+  def update[T](id: String, value: T): Future[Unit]
 
   /**
     * Delete all data related to some given session id.

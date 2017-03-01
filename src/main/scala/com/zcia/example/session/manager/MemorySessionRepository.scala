@@ -36,7 +36,7 @@ class MemorySessionRepository(maxSize: Option[Long]=None, ttl: Option[Duration]=
     * @param id
     * @return
     */
-  override def read(id: String): Future[Option[Object]] = get(id)
+  override def read[T](id: String): Future[Option[T]] = get(id)
 
   /**
     * Update the whole session data with a new one given some session id.
@@ -45,7 +45,7 @@ class MemorySessionRepository(maxSize: Option[Long]=None, ttl: Option[Duration]=
     * @param value
     * @return
     */
-  override def update(id: String, value: Object): Future[Unit] = put(id)(value, ttl)
+  override def update[T](id: String, value: T): Future[Unit] = put(id)(value, ttl)
 
   /**
     * Delete all data related to some given session id.
