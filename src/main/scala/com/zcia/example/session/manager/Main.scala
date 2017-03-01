@@ -3,9 +3,12 @@ package com.zcia.example.session.manager
 import akka.http.scaladsl.server.{HttpApp, Route}
 
 /**
-  * Created by zuma on 27/02/17.
+  * Main server class.
+  *
+  * @author jazumaquero
+  * @since 27/02/17.
   */
-object Main extends HttpApp {
+object Main extends HttpApp with ServerBaseConfig{
 
   val path = "session"
 
@@ -35,5 +38,5 @@ object Main extends HttpApp {
     }
   }
 
-  Main.startServer(host="localhost",port=8080)
+  Main.startServer(host=host,port=port)
 }
