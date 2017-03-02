@@ -8,7 +8,7 @@ libraryDependencies ++= {
   val akkaHttpV = "10.0.4"
   val scalaCacheV = "0.9.3"
   val scalaTestV = "3.0.1"
-  val scalaMockV = "3.5.0"
+  val mockitoV = "1.9.5"
 
   Seq(
     "com.typesafe.akka"   %%  "akka-actor"    % akkaV,
@@ -20,7 +20,7 @@ libraryDependencies ++= {
     "com.typesafe.akka"   %%  "akka-testkit"  % akkaV   % "test",
     "com.typesafe.akka"   %%  "akka-http-testkit" % akkaHttpV % "test",
     "org.scalatest"       %%  "scalatest"     % scalaTestV % "test",
-    "org.scalamock"       %% "scalamock-scalatest-support" % scalaMockV % "test",
+    "org.mockito" % "mockito-all" % mockitoV % "test",
     "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0"
   )
 }

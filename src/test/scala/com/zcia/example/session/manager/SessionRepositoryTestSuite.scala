@@ -22,8 +22,8 @@ abstract class SessionRepositoryTestSuite extends FlatSpec with BeforeAndAfter {
     repository.clean()
   }
 
-  behavior of "SessionRepository when create new session id"
-  it should "create some randon session id" in {
+  behavior of "SessionRepository "
+  it should "create some randon session id when create new session id" in {
     val generatedSessionIds = Array[String]()
     for (i <- 1 to 1000000) {
       val sessionId = repository.create()
@@ -31,9 +31,7 @@ abstract class SessionRepositoryTestSuite extends FlatSpec with BeforeAndAfter {
       generatedSessionIds ++ sessionId
     }
   }
-
-  behavior of "SessionRepository when get non previous stored session id"
-  it should "return some empty data" in {
+  it should "return some empty data when get non previous stored session id " in {
     val sessionId = repository.create()
     val result = repository.read(sessionId) map { cachedData =>
       cachedData match {
@@ -45,9 +43,7 @@ abstract class SessionRepositoryTestSuite extends FlatSpec with BeforeAndAfter {
     }
     Await.ready(result, Duration.Inf)
   }
-
-  behavior of "SessionRepository when get previous stored session id"
-  it should "return previous updated data" in {
+  it should "return previous updated data when get previous stored session id" in {
     val sessionId = repository.create()
     val sessionData = Array("hi", "world", 2, true)
     val putResult = repository.update(sessionId, sessionData)
@@ -62,9 +58,7 @@ abstract class SessionRepositoryTestSuite extends FlatSpec with BeforeAndAfter {
     }
     Await.ready(getResult, Duration.Inf)
   }
-
-  behavior of "SessionRepository when delete some session id"
-  it should "return some empty data when data is present" in {
+  it should "return some empty data when data is present when delete some session id " in {
     val sessionId = repository.create()
     val sessionData = Array("hi", "world", 2, true)
     val putResult = repository.update(sessionId, sessionData)

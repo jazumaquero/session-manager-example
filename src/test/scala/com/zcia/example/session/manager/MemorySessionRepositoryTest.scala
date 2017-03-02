@@ -13,14 +13,12 @@ class MemorySessionRepositoryTest extends SessionRepositoryTestSuite {
   /** Implementation of repository that is going to be tested. **/
   override protected implicit val repository: SessionRepository = new MemorySessionRepository()
 
-  behavior of "MemorySessionRepository when maxSize is set to some long"
-  it should "do something when max size is reach" in {
+  behavior of "MemorySessionRepository"
+  it should "do not insert when max size is reach when maxSize is set to some long" in {
     val repository: SessionRepository = new MemorySessionRepository(maxSize = Some(10))
     // TODO
   }
-
-  behavior of "MemorySessionRepository when ttl is set to some duration"
-  it should " " in {
+  it should "remove data when ttl is set to some duration" in {
     val repository: SessionRepository = new MemorySessionRepository(ttl = Some(Duration(1, "second")))
     // TODO
   }

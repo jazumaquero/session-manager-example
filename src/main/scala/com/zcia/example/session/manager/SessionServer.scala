@@ -25,19 +25,29 @@ trait SessionServer {
     case Some(sid) =>
       get {
         onComplete(repository.read[Array[Byte]](sid.value)) { data =>
-          complete(OK, data)
+          setCookie(HttpCookie(cookieName, value = sid.value)) {
+            complete(OK, data)
+          }
         }
       } ~ put {
         entity(as[Array[Byte]]){ data =>
           onComplete(repository.update(sid.value,data)) {
             case Failure(ex) => complete(InternalServerError, s"Cannot update session ${sid.value} with $data due to :${ex.getMessage}")
-            case _ => complete(OK)
+            case _ => setCookie(HttpCookie(cookieName, value = sid.value)) {
+              complete(OK)
+            }
           }
         }
       } ~ delete {
         onComplete(repository.delete(sid.value)) {
           case Failure(ex) => complete(InternalServerError, s"Cannot delete session ${sid.value} due to :${ex.getMessage}")
-          case _ => complete(OK)
+          case _ => setCookie(HttpCookie(cookieName, value = sid.value)) {
+            complete(OK)
+          }
+        }
+      } ~ post {
+        setCookie(HttpCookie(cookieName, value = sid.value)) {
+          complete(Created)
         }
       }
     case None =>
