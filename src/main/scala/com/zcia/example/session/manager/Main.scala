@@ -8,34 +8,14 @@ import akka.http.scaladsl.server.{HttpApp, Route}
   * @author jazumaquero
   * @since 27/02/17.
   */
-object Main extends HttpApp with ServerBaseConfig{
+object Main extends HttpApp with App with SessionServer with ServerBaseConfig with CacheBaseConfig{
 
-  val path = "session"
+  override protected implicit val repository: SessionRepository = SessionRepositoryFactory.build(cacheType, ttl,maxSize)
 
-  override protected def route: Route = getSession ~ putSession ~ postSession ~ deleteSession
+  override protected implicit val cookieName: String = cookie
 
-  def getSession = path(path) {
-    get{
-      complete("TODO")
-    }
-  }
-
-  def postSession=path(path) {
-    post{
-      complete("TODO")
-    }
-  }
-
-  def putSession=path(path) {
-    put{
-      complete("TODO")
-    }
-  }
-
-  def deleteSession=path(path) {
-    delete{
-      complete("TODO")
-    }
+  override protected def route: Route = path("session") {
+    sessionRoutes
   }
 
   Main.startServer(host=host,port=port)

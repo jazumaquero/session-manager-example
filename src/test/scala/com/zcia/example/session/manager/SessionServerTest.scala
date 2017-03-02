@@ -1,10 +1,12 @@
 package com.zcia.example.session.manager
 
+import akka.http.scaladsl.model.HttpEntity
 import akka.http.scaladsl.model.StatusCodes._
+import akka.http.scaladsl.model.MediaTypes._
 import akka.http.scaladsl.model.headers.{Cookie, HttpCookie, `Set-Cookie`}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import org.mockito.Mockito._
 import org.mockito.Matchers._
+import org.mockito.Mockito._
 import org.scalatest.mockito.MockitoSugar
 import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
 
@@ -49,43 +51,58 @@ class SessionServerTest extends FlatSpec with Matchers with BeforeAndAfter with 
   behavior of "SessionServer instance"
   it should "return ok including proper session id when cookie is not present" in {
     Post() ~> sessionRoutes ~> check {
+      // Check response content
       header[`Set-Cookie`] shouldEqual Some(`Set-Cookie`(HttpCookie(cookieName, value = mockedSessionId)))
       status === Created
+      // Verify that repository calls where properly performed
+      verify(repository).create()
     }
   }
   it should "return ok including proper session id when cookie is present" in {
     Post() ~> addHeader(Cookie(cookieName, mockedSessionId)) ~> sessionRoutes ~> check {
+      // Check response content
       header[`Set-Cookie`] shouldEqual Some(`Set-Cookie`(HttpCookie(cookieName, value = mockedSessionId)))
       status === Created
+      // Verify that repository calls where properly performed
+      verify(repository).create()
     }
   }
   it should "return ok including proper session data when session cookie is present" in {
     Get() ~> addHeader(Cookie(cookieName, mockedSessionId)) ~> sessionRoutes ~> check {
+      // Check response content
       header[`Set-Cookie`] shouldEqual Some(`Set-Cookie`(HttpCookie(cookieName, value = mockedSessionId)))
       status === OK
-      //verify(repository.read(mockedSessionId))
-      //responseAs[Array[Byte]] should be(mockedSessionData)
+      responseAs[Array[Byte]] should be(mockedSessionData)
+      // Verify that repository calls where properly performed
+      verify(repository).read(mockedSessionId)
     }
   }
-  it should "return ok including none data when session cookie id is missing" in {
+  it should "return ok including none or empty data when session cookie id is missing" in {
     Get() ~> addHeader(Cookie(cookieName, missingSessionId)) ~> sessionRoutes ~> check {
-      header[`Set-Cookie`] shouldEqual Some(`Set-Cookie`(HttpCookie(cookieName, value = mockedSessionId)))
+      // Check response content
+      header[`Set-Cookie`] shouldEqual Some(`Set-Cookie`(HttpCookie(cookieName, value = missingSessionId)))
       status === OK
-      //verify(repository.read(missingSessionId))
+      responseAs[Array[Byte]] should be(Array())
+      // Verify that repository calls where properly performed
+      verify(repository).read(missingSessionId)
     }
   }
-  it should "return ok when update session data and when session cookie id is missing" in {
-    Put() ~> addHeader(Cookie(cookieName, mockedSessionId)) ~> sessionRoutes ~> check {
+  it should "return ok when update session data and when session cookie id is present" in {
+    Put("/",HttpEntity(`application/json`, mockedSessionData)) ~> addHeader(Cookie(cookieName, mockedSessionId)) ~> sessionRoutes ~> check {
+      // Check response content
       header[`Set-Cookie`] shouldEqual Some(`Set-Cookie`(HttpCookie(cookieName, value = mockedSessionId)))
       status === OK
-      //verify(repository.update(anyString, any))
+      // Verify that repository calls where properly performed
+      verify(repository).update(mockedSessionId, mockedSessionData)
     }
   }
-  it should "return ok when delete session data when session cookie id is missing" in {
-    Delete() ~> addHeader(Cookie(cookieName, missingSessionId)) ~> sessionRoutes ~> check {
+  it should "return ok when delete session data when session cookie id is present" in {
+    Delete() ~> addHeader(Cookie(cookieName, mockedSessionId)) ~> sessionRoutes ~> check {
+      // Check response content
       header[`Set-Cookie`] shouldEqual Some(`Set-Cookie`(HttpCookie(cookieName, value = mockedSessionId)))
       status === OK
-      //verify(repository.delete(anyString))
+      // Verify that repository calls where properly performed
+      verify(repository).delete(mockedSessionId)
     }
   }
 }

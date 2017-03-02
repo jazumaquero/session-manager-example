@@ -24,7 +24,6 @@ libraryDependencies ++= {
     "com.typesafe.scala-logging" %% "scala-logging" % "3.1.0"
   )
 }
-javaOptions in Test += "-Dconfig.file=application.test.conf"
 
 mainClass in assembly := Some("com.zcia.example.session.manager.SessionManagerServer")
 assemblyOption in assembly := (assemblyOption in assembly).value.copy(includeScala = false)

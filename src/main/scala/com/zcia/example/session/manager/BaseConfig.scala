@@ -27,9 +27,7 @@ trait CacheBaseConfig extends BaseConfig {
 
   /** Optional max time to live for any cache entry **/
   val ttl: Option[Duration] = try {
-    val duration = cacheConfig.getLong("ttl.duration")
-    val units = cacheConfig.getString("ttl.units")
-    Some(Duration(duration,units))
+    Some(Duration(cacheConfig.getLong("ttl.duration"),cacheConfig.getString("ttl.unit")))
   } catch {
     case ex: ConfigException.Missing => None
   }
@@ -40,6 +38,9 @@ trait CacheBaseConfig extends BaseConfig {
   } catch {
     case ex: ConfigException.Missing => None
   }
+
+  /** Indicates what implementation is going to be used. Currently supported: memory. **/
+  val cacheType: String = cacheConfig.getString("type")
 }
 
 /**
@@ -57,5 +58,8 @@ trait ServerBaseConfig extends BaseConfig {
 
   /** Port where server is going to listen to. **/
   val port: Int = serverConfig.getInt("port")
+
+  /** Cookie name is going to be used by the session manager service. **/
+  val cookie: String = serverConfig.getString("cookie")
 }
 
