@@ -14,7 +14,7 @@ object Main extends HttpApp with App with SessionServer with ServerBaseConfig wi
 
   override protected implicit val cookieName: String = cookie
 
-  override protected def route: Route = path("session") {
+  override protected def route: Route = path(root) {
     sessionRoutes
   }
 

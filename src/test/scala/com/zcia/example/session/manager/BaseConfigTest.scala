@@ -33,4 +33,7 @@ class BaseConfigTest extends FlatSpec with CacheBaseConfig with ServerBaseConfig
   it should "load cookie name" in {
     assert(cookie.equals("foo.bar.nav"))
   }
+  it should "load root path" in {
+    assert(root.equals("session"))
+  }
 }

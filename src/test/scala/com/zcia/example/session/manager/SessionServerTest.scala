@@ -1,9 +1,11 @@
 package com.zcia.example.session.manager
 
-import akka.http.scaladsl.model.HttpEntity
-import akka.http.scaladsl.model.StatusCodes._
+import akka.http.scaladsl.model.HttpMethods._
 import akka.http.scaladsl.model.MediaTypes._
+import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.headers.{Cookie, HttpCookie, `Set-Cookie`}
+import akka.http.scaladsl.model.{DateTime, HttpEntity}
+import akka.http.scaladsl.server.MethodRejection
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -88,7 +90,7 @@ class SessionServerTest extends FlatSpec with Matchers with BeforeAndAfter with 
     }
   }
   it should "return ok when update session data and when session cookie id is present" in {
-    Put("/",HttpEntity(`application/json`, mockedSessionData)) ~> addHeader(Cookie(cookieName, mockedSessionId)) ~> sessionRoutes ~> check {
+    Put("/", HttpEntity(`application/json`, mockedSessionData)) ~> addHeader(Cookie(cookieName, mockedSessionId)) ~> sessionRoutes ~> check {
       // Check response content
       header[`Set-Cookie`] shouldEqual Some(`Set-Cookie`(HttpCookie(cookieName, value = mockedSessionId)))
       status === OK
@@ -97,12 +99,34 @@ class SessionServerTest extends FlatSpec with Matchers with BeforeAndAfter with 
     }
   }
   it should "return ok when delete session data when session cookie id is present" in {
+    // Mocked deleted timestamp given by akka-http teskit!
+    val deletedTimeStamp = DateTime.fromIsoDateTimeString("1800-01-01T00:00:00")
     Delete() ~> addHeader(Cookie(cookieName, mockedSessionId)) ~> sessionRoutes ~> check {
       // Check response content
-      header[`Set-Cookie`] shouldEqual Some(`Set-Cookie`(HttpCookie(cookieName, value = mockedSessionId)))
+      header[`Set-Cookie`] shouldEqual Some(`Set-Cookie`(HttpCookie(cookieName, "deleted", expires = deletedTimeStamp)))
       status === OK
       // Verify that repository calls where properly performed
       verify(repository).delete(mockedSessionId)
+    }
+  }
+  it should "reject when cookie is missing and requested method is not post" in {
+    Get() ~> sessionRoutes ~> check {
+      rejection shouldBe MethodRejection(POST)
+    }
+    Put() ~> sessionRoutes ~> check {
+      rejection shouldBe MethodRejection(POST)
+    }
+    Delete() ~> sessionRoutes ~> check {
+      rejection shouldBe MethodRejection(POST)
+    }
+    Patch() ~> sessionRoutes ~> check {
+      rejection shouldBe MethodRejection(POST)
+    }
+    Options() ~> sessionRoutes ~> check {
+      rejection shouldBe MethodRejection(POST)
+    }
+    Head() ~> sessionRoutes ~> check {
+      rejection shouldBe MethodRejection(POST)
     }
   }
 }

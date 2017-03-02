@@ -21,7 +21,7 @@ trait SessionServer {
   /** Name of the cookie is going to be used to store the session id. **/
   protected implicit val cookieName: String
 
-  def sessionRoutes : Route = optionalCookie(cookieName) {
+  def sessionRoutes: Route = optionalCookie(cookieName) {
     case Some(sid) =>
       get {
         onComplete(repository.read[Array[Byte]](sid.value)) { data =>
@@ -30,8 +30,8 @@ trait SessionServer {
           }
         }
       } ~ put {
-        entity(as[Array[Byte]]){ data =>
-          onComplete(repository.update(sid.value,data)) {
+        entity(as[Array[Byte]]) { data =>
+          onComplete(repository.update(sid.value, data)) {
             case Failure(ex) => complete(InternalServerError, s"Cannot update session ${sid.value} with $data due to :${ex.getMessage}")
             case _ => setCookie(HttpCookie(cookieName, value = sid.value)) {
               complete(OK)
@@ -41,7 +41,7 @@ trait SessionServer {
       } ~ delete {
         onComplete(repository.delete(sid.value)) {
           case Failure(ex) => complete(InternalServerError, s"Cannot delete session ${sid.value} due to :${ex.getMessage}")
-          case _ => setCookie(HttpCookie(cookieName, value = sid.value)) {
+          case _ => deleteCookie(HttpCookie(cookieName, value = sid.value)) {
             complete(OK)
           }
         }
@@ -53,7 +53,7 @@ trait SessionServer {
     case None =>
       post {
         val sessionId = repository.create()
-        setCookie(HttpCookie(cookieName, value = sessionId)){
+        setCookie(HttpCookie(cookieName, value = sessionId)) {
           complete(Created)
         }
       }

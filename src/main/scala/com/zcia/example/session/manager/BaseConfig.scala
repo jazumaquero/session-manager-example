@@ -61,5 +61,8 @@ trait ServerBaseConfig extends BaseConfig {
 
   /** Cookie name is going to be used by the session manager service. **/
   val cookie: String = serverConfig.getString("cookie")
+
+  /** Root path used to identify resource. **/
+  val root: String = serverConfig.getString("root")
 }
 
